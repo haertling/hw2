@@ -102,29 +102,47 @@ void FIFO(int totalJobs){
 }
 
 void SJF(int totalJobs){
-    int c, d, swap;
     Jobs temp;
+    int startTime[totalJobs];
+    int finishTime[totalJobs];
  
 
-  for (c = 0; c < totalJobs; c++)
+    for (int i=0; i < totalJobs; i++)
  
-  for (c = 0 ; c < totalJobs - 1; c++)
-  {
-    for (d = 0 ; d < totalJobs - c - 1; d++)
-    {
-      if (jobA[d].duration > jobA[d+1].duration) /* For decreasing order use < */
-      {
-        temp       = jobA[d];
-        jobA[d]   = jobA[d+1];
-        jobA[d+1] = temp;
-      }
+        for (int i = 0 ; i < totalJobs - 1; i++){
+            for (int j = 0 ; j < totalJobs - i - 1; j++) {
+                if(jobA[j].arrivalTime == jobA[j+1].arrivalTime){
+                    if (jobA[j].duration > jobA[j+1].duration) { /* For decreasing order use < */ 
+                        temp = jobA[j];
+                        jobA[j] = jobA[j+1];
+                        jobA[j+1] = temp;
+                        }
+                    }
+            }
+        }
+ 
+ 
+  // for (c = 0; c < totalJobs; c++)
+  //    printf("%d\n", jobA[c]);
+
+int time = 0 ;
+    
+    for(int g = 0; g < totalJobs; g ++){
+        startTime[g] = time;
+        for(int l = 0; l < jobA[g].duration; l++){
+            time++;
+        }
+        finishTime[g] = time;
     }
-  }
- 
-  printf("Sorted list in ascending order:\n");
- 
-  for (c = 0; c < totalJobs; c++)
-     printf("%d\n", jobA[c]);
+
+
+ for(int m=0; m < totalJobs; m++){
+        printf("ID %d\n", jobA[m].id);
+        printf("Start Time %d\n",startTime[m]);
+        printf("Finish Time %d\n",finishTime[m]);
+        printf("Total Time %d\n",jobA[m].duration);
+        printf("Response Time %d\n\n",(startTime[m]-jobA[m].arrivalTime));
+    }
 
     // int min;
     // Jobs temp;
