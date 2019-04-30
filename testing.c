@@ -6,10 +6,12 @@
 void FIFO(int);
 void SJF(int);
 void BJF(int);
+void STCF(int);
 void RR(int);
 void bubbleSort(int,int);
 
-typedef struct Jobs{
+typedef struct Jobs
+{
     int id;
     int arrivalTime;
     int duration;
@@ -21,7 +23,8 @@ Jobs jobA[MAX_ARRAY_SIZE];
 
 int ReadFile(char *fileName);
 
-int main(int argc, char *argv[]){
+int main(int argc, char *argv[])
+{
     char *fileName = "jobs.dat";
     int totalJobs = ReadFile(fileName);
 
@@ -32,22 +35,35 @@ int main(int argc, char *argv[]){
     SJF(totalJobs);
     printf("This is BJF \n");
     BJF(totalJobs);
+    printf("This is STCF \n");
+    STCF(totalJobs);
     printf("This is RR \n");
     RR(totalJobs);
+    /*
+    for (i = 0; i < totalJobs; i++)
+    {
+        printf("ID : %d\n", jobA[i].id);
+        printf("Arrival time  : %d\n", jobA[i].arrivalTime);
+        printf("Duration : %d\n", jobA[i].duration);
+        printf("\n");
+    }*/
 
     exit(EXIT_SUCCESS);
 }
 
-int ReadFile(char *fileName){
+int ReadFile(char *fileName)
+{
     FILE *filePtr = NULL;
     int  i = 0;
 
-    if ((filePtr = fopen(fileName, "r")) == NULL){
+    if ((filePtr = fopen(fileName, "r")) == NULL)
+    {
         printf("Error : Unable to open %s for reading\n",fileName);
         exit(EXIT_FAILURE);
     }
 
-    while (fscanf(filePtr, "%d%d%d", &jobA[i].id, &jobA[i].arrivalTime, &jobA[i].duration) != EOF){
+    while (fscanf(filePtr, "%d%d%d", &jobA[i].id, &jobA[i].arrivalTime, &jobA[i].duration) != EOF)
+    {
         i++;
     }
 
@@ -102,7 +118,9 @@ void SJF(int totalJobs){
     int startTime[totalJobs];
     int finishTime[totalJobs];
  
-    for (int i=0; i < totalJobs; i++){
+
+    for (int i=0; i < totalJobs; i++)
+ 
         for (int i = 0 ; i < totalJobs - 1; i++){
             for (int j = 0 ; j < totalJobs - i - 1; j++) {
                 if(jobA[j].arrivalTime == jobA[j+1].arrivalTime){
@@ -110,16 +128,21 @@ void SJF(int totalJobs){
                         temp = jobA[j];
                         jobA[j] = jobA[j+1];
                         jobA[j+1] = temp;
+                        }
                     }
-                }
             }
         }
-    }
-    int time = 0 ;
+ 
+ 
+  // for (c = 0; c < totalJobs; c++)
+  //    printf("%d\n", jobA[c]);
+
+int time = 0 ;
+    
     for(int g = 0; g < totalJobs; g ++){
-        if(jobA[g].arrivalTime > time){//if no job available to run
-            time = jobA[g].arrivalTime;
-        }
+     if(jobA[g].arrivalTime > time){//if no job available to run
+                     time = jobA[g].arrivalTime;
+                }
         startTime[g] = time;
         for(int l = 0; l < jobA[g].duration; l++){
             time++;
@@ -128,7 +151,7 @@ void SJF(int totalJobs){
     }
 
 
-    for(int m=0; m < totalJobs; m++){
+ for(int m=0; m < totalJobs; m++){
         printf("ID %d\t", jobA[m].id);
         printf("Start Time %d\t",startTime[m]);
         printf("Finish Time %d\t",finishTime[m]);
@@ -143,7 +166,9 @@ void BJF(int totalJobs){
     int startTime[totalJobs];
     int finishTime[totalJobs];
  
-    for (int i=0; i < totalJobs; i++){
+
+    for (int i=0; i < totalJobs; i++)
+ 
         for (int i = 0 ; i < totalJobs - 1; i++){
             for (int j = 0 ; j < totalJobs - i - 1; j++) {
                 if(jobA[j].arrivalTime == jobA[j+1].arrivalTime){
@@ -151,16 +176,21 @@ void BJF(int totalJobs){
                         temp = jobA[j];
                         jobA[j] = jobA[j+1];
                         jobA[j+1] = temp;
+                        }
                     }
-                }
             }
         }
-    }    
-    int time = 0 ;
+ 
+ 
+  // for (c = 0; c < totalJobs; c++)
+  //    printf("%d\n", jobA[c]);
+
+int time = 0 ;
+    
     for(int g = 0; g < totalJobs; g ++){
-        if(jobA[g].arrivalTime > time){//if no job available to run
-            time = jobA[g].arrivalTime;
-        }
+     if(jobA[g].arrivalTime > time){//if no job available to run
+                     time = jobA[g].arrivalTime;
+                }
         startTime[g] = time;
         for(int l = 0; l < jobA[g].duration; l++){
             time++;
@@ -169,7 +199,7 @@ void BJF(int totalJobs){
     }
 
 
-    for(int m=0; m < totalJobs; m++){
+ for(int m=0; m < totalJobs; m++){
         printf("ID %d\t", jobA[m].id);
         printf("Start Time %d\t",startTime[m]);
         printf("Finish Time %d\t",finishTime[m]);
@@ -177,6 +207,62 @@ void BJF(int totalJobs){
         printf("Response Time %d\t\n",(startTime[m]-jobA[m].arrivalTime));
     }
 
+}
+
+// Danny Implementation of STCF
+void STCF(int totalJobs){
+    int time = 0;
+    int completedJobs = 0;
+    int startTime[totalJobs];
+    int finishTime[totalJobs];
+    
+    // Create a new Job array, copy over from jobA
+    Jobs jobC[MAX_ARRAY_SIZE];
+    for(int d = 0; d < totalJobs; d++){
+        jobC[d] = jobA[d];
+    }
+    
+    while(completedJobs <= totalJobs){
+        for(int a = 0; a < totalJobs; a++){
+            // Check if job is available to run
+            if(jobC[a].arrivalTime > time){
+                time = jobC[a].arrivalTime;
+                // jump to first arrival
+            }
+            // While the current job duration is not zero
+            while(jobC[a].duration != 0){
+                // Check first if there is a better job to run
+                // if the current time is equal to next job arrival time 
+                // AND
+                // the duration of the next job is less than the duration of the current job
+                if((time == jobC[a+1].arrivalTime) && (jobC[a+1].duration < jobC[a].duration)){
+                    // Jump into next job 
+                    while(jobC[a+1].duration != 0){
+                        startTime[a+1] = time; // set start time for running job
+                        time++; // increment time
+                        jobC[a+1].duration = jobC[a+1].duration - 1; // decrement current job duration
+                    }
+                    // after completing the next job, set its finish time and increment number of completed jobs
+                    completedJobs++;
+                    finishTime[a+1] = time;
+                }
+                // If there is no better job to run, continue running current job and checking for a better job
+                startTime[a] = time; 
+                time++; // increment time
+                jobC[a].duration = jobC[a].duration - 1; // decrement curernt job duration
+            }
+        // When it exits previous loop, jobC[a] is completed, increment number of completed jobs and set finish time
+        completedJobs++;
+        finishTime[a] = time; 
+        }
+    }
+    for(int m=0; m < totalJobs; m++){
+        printf("ID %d\t", jobC[m].id);
+        printf("Start Time %d\t",startTime[m]);
+        printf("Finish Time %d\t",finishTime[m]);
+        printf("Total Time %d\t",(finishTime[m]-jobC[m].arrivalTime));
+        printf("Response Time %d\t\n",(startTime[m]-jobC[m].arrivalTime));
+    }
 }
 
 void RR(int totalJobs){
@@ -266,4 +352,3 @@ void RR(int totalJobs){
         printf("Response Time %d\t\n",(startTime[m]-jobC[m].arrivalTime));
     }
 }
-
