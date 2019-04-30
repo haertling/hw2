@@ -90,6 +90,9 @@ void FIFO(int totalJobs){
     int time = 0 ;
     
     for(int k=0; k < totalJobs; k++){
+        if( jobA[k].arrivalTime > time){//if no job available to run
+                     time = jobA[k].arrivalTime;
+        }
         startTime[k] = time;
         for(int l=0; l < jobA[k].duration; l++){
             time++;
@@ -98,11 +101,11 @@ void FIFO(int totalJobs){
     }
     
     for(int m=0; m < totalJobs; m++){
-        printf("ID %d\n", jobA[m].id);
-        /*printf("Start Time %d\n",startTime[m]);
-        printf("Finish Time %d\n",finishTime[m]);
-        printf("Total Time %d\n",(finishTime[m]-jobA[m].arrivalTime));
-        printf("Response Time %d\n\n",(startTime[m]-jobA[m].arrivalTime));*/
+        printf("ID %d\t", jobA[m].id);
+        printf("Start Time %d\t",startTime[m]);
+        printf("Finish Time %d\t",finishTime[m]);
+        printf("Total Time %d\t",(finishTime[m]-jobA[m].arrivalTime));
+        printf("Response Time %d\t\n",(startTime[m]-jobA[m].arrivalTime));
     }
     
 }
@@ -134,6 +137,9 @@ void SJF(int totalJobs){
 int time = 0 ;
     
     for(int g = 0; g < totalJobs; g ++){
+     if(jobA[g].arrivalTime > time){//if no job available to run
+                     time = jobA[g].arrivalTime;
+                }
         startTime[g] = time;
         for(int l = 0; l < jobA[g].duration; l++){
             time++;
@@ -143,11 +149,11 @@ int time = 0 ;
 
 
  for(int m=0; m < totalJobs; m++){
-        printf("ID %d\n", jobA[m].id);
-        /*printf("Start Time %d\n",startTime[m]);
-        printf("Finish Time %d\n",finishTime[m]);
-        printf("Total Time %d\n",(finishTime[m]-jobA[m].arrivalTime));
-        printf("Response Time %d\n\n",(startTime[m]-jobA[m].arrivalTime));*/
+        printf("ID %d\t", jobA[m].id);
+        printf("Start Time %d\t",startTime[m]);
+        printf("Finish Time %d\t",finishTime[m]);
+        printf("Total Time %d\t",(finishTime[m]-jobA[m].arrivalTime));
+        printf("Response Time %d\t\n",(startTime[m]-jobA[m].arrivalTime));
     }
 
 }
@@ -179,6 +185,9 @@ void BJF(int totalJobs){
 int time = 0 ;
     
     for(int g = 0; g < totalJobs; g ++){
+     if(jobA[g].arrivalTime > time){//if no job available to run
+                     time = jobA[g].arrivalTime;
+                }
         startTime[g] = time;
         for(int l = 0; l < jobA[g].duration; l++){
             time++;
@@ -188,34 +197,46 @@ int time = 0 ;
 
 
  for(int m=0; m < totalJobs; m++){
-        printf("ID %d\n", jobA[m].id);
-       /* printf("Start Time %d\n",startTime[m]);
-        printf("Finish Time %d\n",finishTime[m]);
-        printf("Total Time %d\n",(finishTime[m]-jobA[m].arrivalTime));
-        printf("Response Time %d\n\n",(startTime[m]-jobA[m].arrivalTime));*/
+        printf("ID %d\t", jobA[m].id);
+        printf("Start Time %d\t",startTime[m]);
+        printf("Finish Time %d\t",finishTime[m]);
+        printf("Total Time %d\t",(finishTime[m]-jobA[m].arrivalTime));
+        printf("Response Time %d\t\n",(startTime[m]-jobA[m].arrivalTime));
     }
 
 }
 
 void RR(int totalJobs){
-    int time = 0;
+    int time,i = 0;
     int completedJobs = 0;
+    int numJobs = 0;
+    int addedNum[totalJobs];
     int startTime[totalJobs];
     int finishTime[totalJobs];
     int jobVet[totalJobs];
     int done[totalJobs];
     
+    
     Jobs jobC[MAX_ARRAY_SIZE];
     for(int d = 0; d < totalJobs; d++){
         jobC[d] = jobA[d];
     }
+    for(int d = 0;d < totalJobs; d++){
+        addedNum[d] = 0;
+        startTime[d] = 0;
+        finishTime[d] = 0;
+        jobVet[d] = 0;
+        done[d] = 0;
+    }
 
     
-    while(completedJobs < totalJobs){
+    while(completedJobs < (totalJobs+1)){
         //printf("for loop\n");
         //printf("total jobs %d\n", totalJobs);
         //printf("CJ %d\n", completedJobs);
-        for(int i = 0; i < totalJobs; i++){
+        
+        do{    
+            
             if(jobC[i].duration == 0){//if job done goes down this branch
             //printf("done\n");
                 if(done[i] == 1){
@@ -232,38 +253,80 @@ void RR(int totalJobs){
                 //printf("check arrival time\n");
                 if(jobC[i].arrivalTime > time){//if no job available to run
                      time = jobC[i].arrivalTime;
+                     //printf("time %d\t", time);
                 }
-                if(jobVet[i]){//if job has run before
+                if(jobVet[i]==1){//if job has run before
+                    //printf("duration %d\n", jobC[i].duration);
                     jobC[i].duration--;
+                    
                     time++;
+                    if(jobC[i].duration == 0){//if job done goes down this branch
+                        //printf("done\n");
+                        if(done[i] == 1){
+                            //printf("really done\n");
+                        }
+                        else{// first time done
+                            done[i] = 1;
+                            completedJobs++;
+                            //printf("completed jobs in already run %d\n", completedJobs);
+                            finishTime[i]=time;
+                        }
+                    }// printf("vet time %d\n", time);
                 }
                 else{//if first run
-                    if(jobC[i].arrivalTime < time){
+                        //printf("I got to first run \n");
                         jobVet[i] = 1;
+                        if(addedNum[i] == 0){
+                            addedNum[i] = 1;
+                            numJobs++;
+                            //printf("numJobs %d\n", numJobs);
+                        }
                         startTime[i] = time;
+                       // printf("start time %d\n", startTime[i]);
+                        //printf("duration %d\n", jobC[i].duration);
                         jobC[i].duration--;
                         time++;
-                    }
+                        //printf("time after 1st run %d\n", time);
+                        if(jobC[i].duration == 0){//if job done goes down this branch
+                            //printf("done\n");
+                                if(done[i] == 1){
+                                    //printf("really done\n");
+                                }
+                                else{// first time done
+                                    done[i] = 1;
+                                    completedJobs++;
+                                    //printf("completed jobs in first run %d\n", completedJobs);
+                                    
+                                    finishTime[i]=time;
+                                   // printf("finish time 1st run %d\n", time);
+                                }
+                        }
                 }
-                
             }
-        }
+            i++;
+            if(i > numJobs){
+                i = 0;
+            }
+            
+            //printf("i %d\n",i);
+            //printf("numJobs %d\n", numJobs);
+            //printf("completed %d\n", completedJobs);
+        }while(completedJobs < numJobs);
+        if(numJobs < totalJobs){
+            time = jobC[numJobs+1].arrivalTime -1;  
+             //printf("time outside while %d\n", time);
+        }    
+        //printf("outside while numJobs %d\n", numJobs);
+        
     }
     for(int m=0; m < totalJobs; m++){
-        printf("ID %d\n", jobC[m].id);
-        printf("Start Time %d\n",startTime[m]);
-        printf("Finish Time %d\n",finishTime[m]);
-        printf("Total Time %d\n",(finishTime[m]-jobC[m].arrivalTime));
-        printf("Response Time %d\n\n",(startTime[m]-jobC[m].arrivalTime));
+        printf("ID %d\t", jobC[m].id);
+        printf("Start Time %d\t",startTime[m]);
+        printf("Finish Time %d\t",finishTime[m]);
+        printf("Total Time %d\t",(finishTime[m]-jobC[m].arrivalTime));
+        printf("Response Time %d\t\n",(startTime[m]-jobC[m].arrivalTime));
     }
 }
-
-
-
-
-
-
-
 
 
 
